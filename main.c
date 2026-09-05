@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #define MAX_NOME 50
 #define MAX_PRODUTOS 100
@@ -25,7 +26,7 @@ void ler_dados(Produto *p)
 
     printf("Digite o nome do produto: ");
     scanf("%s", p->nome);
-
+    
     printf("Qual o preco de custo do produto %s: ", p->nome);
     scanf("%f", &(p->valores.custo));
 
@@ -75,6 +76,35 @@ void filtrar_por_preco(Produto p[], int quantidade_produtos, float preco_limite)
     }
 }
 
+void ordenar_por_preco(Produto p[], int quantidade_produtos) {
+    Produto temp;
+    int ok = 0;
+
+    for (int i = 0; i < quantidade_produtos - 1 && !ok; i++)
+    {
+        ok = 1;
+
+        for (int j = 0; j < quantidade_produtos - i - 1; j++)
+        {
+            if (p[j].valores.venda > p[j + 1].valores.venda)
+            {
+                ok = 0;
+                temp = p[j];
+                p[j] = p[j + 1];
+                p[j + 1] = temp;
+            }
+        }
+    }
+    
+    printf("\n------Produtos ordenados por preco de venda------\n");
+
+    for (int i = 0; i < quantidade_produtos; i++)
+    {
+        printf("-> [%d] %s - RS %.2f\n", p[i].codigo, p[i].nome, p[i].valores.venda);
+    }
+    
+}
+
 int main()
 {
     int quantidade_produtos;
@@ -108,6 +138,6 @@ int main()
     scanf("%f", &preco_limite);
 
     filtrar_por_preco(p, quantidade_produtos, preco_limite);
-
+    ordenar_por_preco(p, quantidade_produtos);
     return 0;
 }
