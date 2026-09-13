@@ -67,17 +67,6 @@ void produto_mais_lucrativo(Produto p[], int quantidade_produtos)
     printf("O produto mais lucrativo e o %s com uma margem de %.0f%%\n", p[indice_mais_lucrativo].nome, p[indice_mais_lucrativo].valores.margem);
 }
 
-void filtrar_por_preco(Produto p[], int quantidade_produtos, float preco_limite)
-{
-    for (int i = 0; i < quantidade_produtos; i++)
-    {
-        if (p[i].valores.venda <= preco_limite)
-        {
-            printf("O produto %s esta dentro do limite de preco\n\n", p[i].nome);
-        }
-    }
-}
-
 void ordenar_por_preco(Produto p[], int quantidade_produtos)
 {
     Produto temp;
@@ -150,7 +139,6 @@ int ler_produtos(Produto p[])
 int main()
 {
     int quantidade_produtos = 0;
-    float preco_limite;
     int opcao;
 
     Produto p[MAX_PRODUTOS];
@@ -163,16 +151,15 @@ int main()
     }
 
     do
-    {
+    {loat preco_limite;
         printf("---------------------System products---------------------\n\n");
 
         printf("Escolha uma das opcoes abaixo:\n\n");
         printf("Opcao 1: Mostrar produtos cadastrados\n");
         printf("Opcao 2: Cadastrar um novo produto\n");
         printf("Opcao 3: Ver produto mais lucrativo\n");
-        printf("Opcao 4: Filtrar por preco\n");
-        printf("Opcao 5: Ordenar por preco\n");
-        printf("Opcao 6: Salvar\n");
+        printf("Opcao 4: Ordenar por preco\n");
+        printf("Opcao 5: Salvar\n");
         printf("Caso queira sair tecle 0\n");
 
         scanf("%d", &opcao);
@@ -212,28 +199,14 @@ int main()
             else
                 printf("Nenhum produto cadastrado.\n");
             break;
-
         case 4:
-            if (quantidade_produtos > 0)
-            {
-                printf("Digite um limite de preco: ");
-                scanf("%f", &preco_limite);
-                filtrar_por_preco(p, quantidade_produtos, preco_limite);
-            }
-            else
-            {
-                printf("Nenhum produto cadastrado.\n");
-            }
-            break;
-
-        case 5:
             if (quantidade_produtos > 0)
                 ordenar_por_preco(p, quantidade_produtos);
             else
                 printf("Nenhum produto cadastrado.\n");
             break;
 
-        case 6:
+        case 5:
             salvar_produtos(p, quantidade_produtos);
             break;
 
