@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #define MAX_NOME 50
-#define MAX_PRODUTOS 100
 
 typedef struct valores
 {
@@ -115,21 +115,36 @@ void salvar_produtos(Produto p[], int quantidade_produtos)
     printf("Produtos salvos com sucesso\n");
 }
 
-int ler_produtos(Produto p[])
+int ler_produtos(Produto *p, int *capacidade)
 {
-    FILE *arquivo = fopen("produtos.txt", "r");
-
+    FILE *arquivo = fopen("produtos.txt", "rt"); 
     if (arquivo == NULL)
     {
-        return 0;
+        return 0; 
     }
 
     int i = 0;
+    
+    int leu_com_sucesso = (fscanf(arquivo, "%d %s %f %f", &p[i].codigo, p[i].nome, &p[i].valores.custo, &p[i].valores.venda) == 4);
 
-    while (fscanf(arquivo, "%d %s %f %f", &p[i].codigo, p[i].nome, &p[i].valores.custo, &p[i].valores.venda) == 4 && i < MAX_PRODUTOS)
+    while (leu_com_sucesso)
     {
         p[i].valores.margem = ((p[i].valores.venda - p[i].valores.custo) / p[i].valores.venda) * 100;
         i++;
+
+        if (i >= *capacidade)
+        {
+            (*capacidade) *= 2; 
+            Produto *temp = (Produto *) realloc(p, (*capacidade) * sizeof(Produto));
+            if (temp == NULL)
+            {
+                printf("Erro ao realocar memória!\n");
+                break;
+            }
+            p = temp;
+        }
+
+        leu_com_sucesso = (fscanf(arquivo, "%d %s %f %f", &p[i].codigo, p[i].nome, &p[i].valores.custo, &p[i].valores.venda) == 4);
     }
 
     fclose(arquivo);
@@ -138,12 +153,20 @@ int ler_produtos(Produto p[])
 
 int main()
 {
+    int capacidade = 10;
     int quantidade_produtos = 0;
     int opcao;
 
-    Produto p[MAX_PRODUTOS];
+    Produto *p = (Produto *) malloc(capacidade * sizeof(Produto));
 
-    quantidade_produtos = ler_produtos(p);
+    if (p == NULL)
+    {
+        printf("Erro: falha ao alocar memoria!\n");
+        return 1;
+    }
+    
+
+    quantidade_produtos = ler_produtos(p, &capacidade);
 
     if (quantidade_produtos > 0)
     {
@@ -151,16 +174,15 @@ int main()
     }
 
     do
-    {loat preco_limite;
+    {
         printf("---------------------System products---------------------\n\n");
-
         printf("Escolha uma das opcoes abaixo:\n\n");
         printf("Opcao 1: Mostrar produtos cadastrados\n");
         printf("Opcao 2: Cadastrar um novo produto\n");
         printf("Opcao 3: Ver produto mais lucrativo\n");
         printf("Opcao 4: Ordenar por preco\n");
         printf("Opcao 5: Salvar\n");
-        printf("Caso queira sair tecle 0\n");
+        printf("Caso queira sair tecle 0\n\n");
 
         scanf("%d", &opcao);
 
@@ -169,7 +191,7 @@ int main()
         case 1:
             if (quantidade_produtos == 0)
             {
-                printf("Nenhum produto cadastrado\n");
+                printf("Nenhum produto cadastrado\n\n");
             }
             else
             {
@@ -180,19 +202,24 @@ int main()
             }
             break;
         case 2:
-            if (quantidade_produtos < MAX_PRODUTOS)
+            if (quantidade_produtos < capacidade)
             {
+                capacidade *= 2;
+                Produto *temp = (Produto *) realloc(p, capacidade * sizeof(Produto));
+
+                if (temp == NULL)
+                {
+                    printf("Erro: nao foi possivel alocar a memoria!\n");
+                    break;
+                }
+                p = temp;  
+                
                 printf("\n ---------- Novo Produto ----------\n");
                 ler_dados(&p[quantidade_produtos]);
                 calcular_lucro(&p[quantidade_produtos]);
                 quantidade_produtos++;
                 printf("Produto cadastrado com sucesso!\n");
             }
-            else
-            {
-                printf("Limite de produtos atingido!\n");
-            }
-            break;
         case 3:
             if (quantidade_produtos > 0)
                 produto_mais_lucrativo(p, quantidade_produtos);
@@ -212,6 +239,7 @@ int main()
 
         case 0:
             salvar_produtos(p, quantidade_produtos);
+            free(p);
             break;
         default:
             printf("Opcao invalida, tente novamente!\n");
