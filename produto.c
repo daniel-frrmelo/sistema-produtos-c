@@ -25,16 +25,13 @@ void calcular_lucro(Produto *p)
 
 void imprimir_dados(Produto *p)
 {
-    printf("O produto %s com o codigo %d tem o custo de compra de RS: %.2f e seu preco de venda e de RS: %.2f\n", p->nome, p->codigo, p->valores.custo, p->valores.venda);
-
-    if (p->valores.margem < 0)
-    {
-        printf("A margem de lucro ainda nao foi calculada\n\n");
-    }
-    else
-    {
-        printf("A Margem de lucro desse produto e de %.0f%%\n\n", p->valores.margem);
-    }
+    printf("\n");
+    printf(" Produto: %s \n", p->nome);
+    printf(" Código:  %d \n", p->codigo);
+    printf(" Custo:   R$ %.2f\n", p->valores.custo);
+    printf(" Venda:   R$ %.2f\n", p->valores.venda);
+    printf(" Margem:  %.2f%%\n", p->valores.margem);
+    printf("----------------------------------------\n");
 }
 
 void produto_mais_lucrativo(Produto p[], int quantidade_produtos)
@@ -96,7 +93,6 @@ void salvar_produtos(Produto p[], int quantidade_produtos)
     }
 
     fclose(arquivo);
-    printf("Produtos salvos com sucesso\n");
 }
 
 int ler_produtos(Produto *p, int *capacidade)
@@ -104,7 +100,7 @@ int ler_produtos(Produto *p, int *capacidade)
     FILE *arquivo = fopen("produtos.txt", "rt");
     if (arquivo == NULL)
     {
-        return 0; 
+        return 0;
     }
 
     int i = 0;
@@ -117,8 +113,8 @@ int ler_produtos(Produto *p, int *capacidade)
 
         if (i >= *capacidade)
         {
-            (*capacidade) *= 2; 
-            Produto *temp = (Produto *) realloc(p, (*capacidade) * sizeof(Produto));
+            (*capacidade) *= 2;
+            Produto *temp = (Produto *)realloc(p, (*capacidade) * sizeof(Produto));
             if (temp == NULL)
             {
                 printf("Erro ao realocar memória!\n");
@@ -131,5 +127,73 @@ int ler_produtos(Produto *p, int *capacidade)
     }
 
     fclose(arquivo);
+
     return i;
+}
+
+void remover_produto(Produto p[], int *quantidade_produto)
+{
+    int codigo;
+
+    if (*quantidade_produto == 0)
+    {
+        printf("Nao ha produtos cadastrados no sistema!\n");
+        return;
+    }
+    else
+    {
+        printf("----------------Lista de produtos cadastrados----------------\n\n");
+
+        for (int i = 0; i < *quantidade_produto; i++)
+        {
+            printf("%s codigo[%d]\n", p[i].nome, p[i].codigo);
+        }
+        printf("\n");
+    }
+    printf("Qual o codigo do produto que deseja remover do sistema: ");
+    scanf("%d", &codigo);
+
+    int achou = 0;
+    int indice;
+
+    for (int i = 0; i < *quantidade_produto && !achou; i++)
+    {
+        if (p[i].codigo == codigo)
+        {
+            indice = i;
+            achou = 1;
+        }
+    }
+
+    if (achou)
+    {
+        for (int i = indice; i < *quantidade_produto - 1; i++)
+        {
+            p[i] = p[i + 1];
+        }
+        (*quantidade_produto)--;
+        salvar_produtos(p, *quantidade_produto);
+
+        printf("Produto removido com sucesso!\n");
+    }
+    else
+    {
+        printf("Nao existe um produto com esse codigo cadastrado no sistema!\n");
+    }
+}
+
+void limpar_tela()
+{
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
+}
+
+void pausar_sistema()
+{
+    printf("\nPressione Enter para continuar...");
+    while (getchar() != '\n');
+    getchar();
 }

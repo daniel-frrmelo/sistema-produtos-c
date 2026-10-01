@@ -24,5 +24,7 @@ void produto_mais_lucrativo(Produto p[], int quantidade_produtos);
 void ordenar_por_preco(Produto p[], int quantidade_produtos);
 void salvar_produtos(Produto p[], int quantidade_produtos);
 int ler_produtos(Produto *p, int *capacidade);
-
+void remover_produto(Produto p[], int *quantidade_produtos);
+void limpar_tela();
+void pausar_sistema();
 #endif
